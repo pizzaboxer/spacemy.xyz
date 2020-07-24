@@ -17,7 +17,8 @@
             if(!mysqli_num_rows($result)){ header("Location: /"); die(); }
             $row = $result->fetch_assoc(); //you dont need to do a while loop because you're only fetching one result
             
-            $badges = strpos($row['ranks'], "dev");
+            $badges = explode(',', $row['ranks']);
+				if (!$badges) {$badges = [];}
             $id = $_GET['id'];
             $bio = $row['bio'];
             $interests = $row['interests'];
@@ -37,10 +38,9 @@
             } else {$groupname = "None";}
             $url = "https://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?id=".$id;
 
-            if($badges !== false) {
-                $badge = "<img src='badges/dev.png'>";
-            } else {
-                $badge = "";
+				$badge = "";
+            if(in_array("dev", $badges)) {
+                $badge .= "<img src='badges/dev.png'>";
             }
 
             if($_SERVER['REQUEST_METHOD'] == 'POST') 
@@ -60,6 +60,7 @@
             }
             skipcomment:
         ?>
+        <title><?php echo $user;?> - spacemy.xyz</title>
         <meta property="og:site_name" content="spacemy.xyz"/>
         <meta property="og:title" content="<?php echo $user; ?>"/>
         <meta property="og:image" content="https://spacemy.xyz/pfp/<?php echo $pfp; ?>"/>
@@ -132,7 +133,7 @@
                             while($row = $result->fetch_assoc()) 
                             { 
                                 if($row['sender'] == $user){ $friend = $row['reciever']; } else{ $friend = $row['sender']; }
-                                echo "<a href='/profile.php?id=".getID($friend, $conn)."'><img width='40px;' src='pfp/".getPFP($friend, $conn)."'></a>";
+                                echo "<a href='/profile.php?id=".getID($friend, $conn)."'><img width='40px' height='40px' src='pfp/".getPFP($friend, $conn)."'></a>";
                             } 
                         ?>
                     </div>
